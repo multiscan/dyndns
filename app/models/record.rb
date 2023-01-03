@@ -3,7 +3,7 @@ class Record < ApplicationRecord
   before_save :update_or_create_gandi
 
   def full_name
-    self.name << "." << Rails.application.credentials.domain
+    "#{self.name}.#{Rails.application.credentials.domain}"
   end
 
   def gandi_name
@@ -12,6 +12,15 @@ class Record < ApplicationRecord
       "#{self.name}.#{base}"
     else
       self.name
+    end
+  end
+
+  def full_gandi_name
+    base=ENV.fetch('SUBDOMAIN')
+    if base
+      "#{self.name}.#{base}.#{Rails.application.credentials.domain}"
+    else
+      self.full_name
     end
   end
 
