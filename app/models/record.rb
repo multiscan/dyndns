@@ -20,11 +20,11 @@ class Record < ApplicationRecord
   def update_or_create_gandi
     if self.new_record?
       puts "is a new record creating gandi"
-      # create_gandi
+      create_gandi
     else
       if self.ip_changed?
         puts "updating gandi"
-        # update_gandi 
+        update_gandi 
       end
     end
   end
