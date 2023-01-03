@@ -1,0 +1,27 @@
+<h1>Records</h1>
+
+<% unless @records.empty? %>
+<div id="records">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>IP address</th>
+        <th>Last update</th>
+        <th class="empty"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @records.each do |record| %>
+      <tr>
+        <td><%= record.name %></td>
+        <td><%= record.ip %></td>
+        <td><%= record.updated_at %> (<%= time_ago_in_words(record.updated_at) %>)</td>
+        <td><%= link_to "Show", record_path(record) %></td>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% end %>
+<%= link_to "New record", new_record_path %>
