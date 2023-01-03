@@ -6,6 +6,15 @@ class Record < ApplicationRecord
     self.name << "." << Rails.application.credentials.domain
   end
 
+  def gandi_name
+    base=ENV.fetch('SUBDOMAIN')
+    if base
+      "#{self.name}.#{base}"
+    else
+      self.name
+    end
+  end
+
   # def check!(possibly_new_ip)
   #   if self.ip == possibly_new_ip
   #     self.touch
@@ -34,7 +43,7 @@ class Record < ApplicationRecord
   
   def create_gandi()
     d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
-    res = d.add_record(self.name, "A", self.ttl, self.ip)
+    res = d.add_record(self.gandi_name, "A", self.ttl, self.ip)
     res == "DNS Record Created" || res == "A DNS Record already exists with same value"
   end
 
@@ -45,7 +54,7 @@ class Record < ApplicationRecord
     raise "Failed to fetch record from Gandi" unless r
     i = [self.ip]
     unless i == r.values
-      res = d.replace_records(i, name: self.name, type: "A")
+      res = d.replace_records(i, name: self.gandi_name, type: "A")
       raise "Failed to update record" unless res == "DNS Record Created"
     end
     true
@@ -53,6 +62,6 @@ class Record < ApplicationRecord
 
   def destroy_gandi()
     d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
-    d.delete_records(self.name)
+    d.delete_records(self.gandi_name)
   end
 end

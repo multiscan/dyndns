@@ -90,6 +90,9 @@ GEM
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     erubi (1.12.0)
     gandi_v5 (0.10.1)
       dotenv (~> 2.5)
@@ -234,6 +237,7 @@ DEPENDENCIES
   bootsnap
   capybara
   debug
+  dotenv-rails
   gandi_v5 (~> 0.10)
   importmap-rails
   jbuilder
