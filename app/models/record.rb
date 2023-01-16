@@ -24,14 +24,14 @@ class Record < ApplicationRecord
     end
   end
 
-  # def check!(possibly_new_ip)
-  #   if self.ip == possibly_new_ip
-  #     self.touch
-  #   else
-  #     self.ip = possibly_new_ip
-  #     save!
-  #   end
-  # end
+  def check(possibly_new_ip)
+    if self.ip == possibly_new_ip
+      self.touch
+    else
+      self.ip = possibly_new_ip
+      save
+    end
+  end
 
  private
 

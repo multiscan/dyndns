@@ -62,11 +62,10 @@ class RecordsController < ApplicationController
   # GET /touch/:name
   def touch
     @record = Record.find_by_name(params[:name])
-    render :json => "{}", :status => :bad_request unless @record
+    render :json => {msg: "bad request"}.to_json, :status => :bad_request unless @record
     ip = params[:ip] || request.remote_ip
-    @record.ip = ip
     respond_to do |format|
-      if @record.save
+      if @record.check(ip)
         # format.html { redirect_to record_url(@record), notice: "Record was successfully updated." }
         format.json { render json: {status: 'ok', data: @record}, status: :ok, location: @record }
       else
