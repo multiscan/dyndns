@@ -29,11 +29,12 @@ class Record < ApplicationRecord
       self.touch
     else
       self.ip = possibly_new_ip
+      self.changed_at = DateTime.now()
       save
     end
   end
 
- private
+  private
 
   def update_or_create_gandi
     if self.new_record?
@@ -51,12 +52,14 @@ class Record < ApplicationRecord
   # https://rubydoc.info/github/robertgauld/gandi_v5/main
   
   def create_gandi()
+    return if Rails.env == "development"
     d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
     res = d.add_record(self.gandi_name, "A", self.ttl, self.ip)
     res == "DNS Record Created" || res == "A DNS Record already exists with same value"
   end
 
   def update_gandi()
+    return if Rails.env == "development"
     d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
     # r = d.fetch_records("lth", "A").first
     r = d.fetch_records("lth").select{|r| r.a?}.first
@@ -70,6 +73,7 @@ class Record < ApplicationRecord
   end
 
   def destroy_gandi()
+    return if Rails.env == "development"
     d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
     d.delete_records(self.gandi_name)
   end

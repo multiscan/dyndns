@@ -6,8 +6,9 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>IP address</th>
-        <th>Last update</th>
+        <th>IPv4</th>
+        <th>Last seen</th>
+        <th>Last change</th>
         <th class="empty"></th>
       </tr>
     </thead>
@@ -16,7 +17,8 @@
       <tr>
         <td><%= record.name %></td>
         <td><%= record.ip %></td>
-        <td><%= record.updated_at %> (<%= time_ago_in_words(record.updated_at) %>)</td>
+        <td><%= nice_time(record.updated_at) %></td>
+        <td><%= nice_time(record.changed_at) %></td>
         <td><%= link_to "Show", record_path(record) %></td>
       </tr>
       <% end %>
