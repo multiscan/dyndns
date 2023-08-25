@@ -48,25 +48,52 @@ class Record < ApplicationRecord
     end
   end
 
+  def record_type()
+    @record_type ||= begin
+      if !!(self.ip =~ Resolv::IPv4::Regex)
+        "A"
+      elsif !!(self.ip =~ Resolv::IPv6::Regex)
+        "AAAA"
+      else
+        "CNAME"
+      end
+    end
+  end
+
+  def gandi
+    @gandi ||= GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
+  end
+
+  def gandi_records
+    @gandi_records ||= begin
+      gandi.fetch_records(self.gandi_name)
+    end
+  end
+
+  def gandi_values
+    r = gandi_records.select {|r| r.type == record_type}.first
+    r.nil? ? [] : r.values
+  end
+
   # https://github.com/robertgauld/gandi_v5
   # https://rubydoc.info/github/robertgauld/gandi_v5/main
-  
+  # I assume that four our usecase, records always have one single value
   def create_gandi()
     return if Rails.env == "development"
-    d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
-    res = d.add_record(self.gandi_name, "A", self.ttl, self.ip)
-    res == "DNS Record Created" || res == "A DNS Record already exists with same value"
+    gv = gandi_values
+    if gv.empty?
+      res = gandi.add_record(self.gandi_name, self.record_type, self.ttl, self.ip)
+      res == "DNS Record Created" || res == "A DNS Record already exists with same value"
+    else
+      update_gandi()
+    end
   end
 
   def update_gandi()
     return if Rails.env == "development"
-    d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
-    # r = d.fetch_records("lth", "A").first
-    r = d.fetch_records("lth").select{|r| r.a?}.first
-    raise "Failed to fetch record from Gandi" unless r
     i = [self.ip]
-    unless i == r.values
-      res = d.replace_records(i, name: self.gandi_name, type: "A")
+    unless i == gandi_values
+      res = gandi.replace_records(i, name: gandi_name, type: record_type)
       raise "Failed to update record" unless res == "DNS Record Created"
     end
     true
@@ -74,7 +101,6 @@ class Record < ApplicationRecord
 
   def destroy_gandi()
     return if Rails.env == "development"
-    d = GandiV5::LiveDNS::domain(Rails.application.credentials.domain)
-    d.delete_records(self.gandi_name)
+    gandi.delete_records(self.gandi_name)
   end
 end
