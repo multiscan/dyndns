@@ -43,7 +43,7 @@ class Record < ApplicationRecord
     else
       if self.ip_changed?
         puts "updating gandi"
-        update_gandi 
+        update_gandi
       end
     end
   end
