@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 class RecordsController < ApplicationController
-  http_basic_authenticate_with name: Rails.application.credentials.user, password: Rails.application.credentials.password, except: :touch
-  
-  before_action :set_record, only: %i[ show edit update destroy ]
+  http_basic_authenticate_with name: Rails.application.credentials.user,
+                               password: Rails.application.credentials.password, except: :touch
+
+  before_action :set_record, only: %i[show edit update destroy]
 
   # GET /records or /records.json
   def index
@@ -9,8 +12,7 @@ class RecordsController < ApplicationController
   end
 
   # GET /records/1 or /records/1.json
-  def show
-  end
+  def show; end
 
   # GET /records/new
   def new
@@ -18,8 +20,7 @@ class RecordsController < ApplicationController
   end
 
   # GET /records/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /records or /records.json
   def create
@@ -27,11 +28,11 @@ class RecordsController < ApplicationController
 
     respond_to do |format|
       if @record.save
-        format.html { redirect_to record_url(@record), notice: "Record was successfully created." }
+        format.html { redirect_to record_url(@record), notice: t(".succes") }
         format.json { render :show, status: :created, location: @record }
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @record.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @record.errors, status: :unprocessable_content }
       end
     end
   end
@@ -40,11 +41,11 @@ class RecordsController < ApplicationController
   def update
     respond_to do |format|
       if @record.update(record_params)
-        format.html { redirect_to record_url(@record), notice: "Record was successfully updated." }
+        format.html { redirect_to record_url(@record), notice: t(".success") }
         format.json { render :show, status: :ok, location: @record }
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @record.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @record.errors, status: :unprocessable_content }
       end
     end
   end
@@ -54,35 +55,36 @@ class RecordsController < ApplicationController
     @record.destroy
 
     respond_to do |format|
-      format.html { redirect_to records_url, notice: "Record was successfully destroyed." }
+      format.html { redirect_to records_url, notice: t(".success") }
       format.json { head :no_content }
     end
   end
 
   # GET /touch/:name
   def touch
-    @record = Record.find_by_name(params[:name])
-    render :json => {msg: "bad request"}.to_json, :status => :bad_request unless @record
+    @record = Record.find_by(name: params[:name])
+    render json: { msg: "bad request" }.to_json, status: :bad_request unless @record
     ip = params[:ip] || request.remote_ip
     respond_to do |format|
       if @record.check(ip)
         # format.html { redirect_to record_url(@record), notice: "Record was successfully updated." }
-        format.json { render json: {status: 'ok', data: @record}, status: :ok, location: @record }
+        format.json { render json: { status: 'ok', data: @record }, status: :ok, location: @record }
       else
         # format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @record.errors, status: :unprocessable_entity }
+        format.json { render json: @record.errors, status: :unprocessable_content }
       end
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_record
-      @record = Record.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def record_params
-      params.require(:record).permit(:name, :ip)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_record
+    @record = Record.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def record_params
+    params.expect(record: %i[name ip])
+  end
 end

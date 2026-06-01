@@ -45,29 +45,18 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-COPY vendor/gems/ vendor/gems/
-RUN ls -l vendor && bundle install && \
+RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
 # Copy application code
 COPY . .
 
-# Get and patch the code for /signatures
-RUN git clone --depth 1 https://github.com/epfl-si/epfl-email-signatures.git ./public/signatures && \
-    rm -rf  public/signatures/.git && \
-    sed -i 's#<head>#<head>\n    <base href="/signatures/index.html" />#' public/signatures/index.html
-
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 REDIS_CACHE=dummy ./bin/rails assets:precompile
-
-ARG APP_VERSION
-RUN echo -n $APP_VERSION > VERSION
-
-
 
 # Final stage for app image
 FROM base
@@ -77,12 +66,12 @@ COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
-RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+RUN groupadd --system --gid 1001 rails && \
+    useradd rails --uid 1001 --gid 1001 --create-home --shell /bin/bash && \
     touch /rails/log/standard.log && chmod 666 /rails/log/standard.log && \
     chown -R rails:rails db log storage tmp
 
-USER 1000:1000
+USER 1001:1001
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

@@ -1,0 +1,95 @@
+plugins:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-minitest
+  - rubocop-capybara
+  # - rubocop-graphql
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  # I just wanted to exclude ops dir because it sends rubocop into infinite loop
+  # but it looks like Exclude is not merged with the default. Therefore I copied
+  # here the default config obtained with `bundle exec rubocop:dump`
+  Exclude:
+    - 'ops/**/*'
+    - "node_modules/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - ".git/**/*"
+    - "app/assets/**/*"
+    - "bin/*"
+    - "db/*schema.rb"
+    - "giova/**/*"
+    - "Learn/**/*"
+    - "log/**/*"
+    - "public/**/*"
+    - "storage/**/*"
+    - "test/{models,controllers,mailers}/*"
+Bundler/DuplicatedGroup:
+  Enabled: false
+Lint/AmbiguousOperatorPrecedence:
+  Enabled: false
+Lint/MissingSuper:
+  Enabled: false
+Naming/MethodParameterName:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/ParameterLists:
+  Enabled: true
+  CountKeywordArgs: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+Style/HashSyntax:
+  # this can be re-enabled when we switch to ruby >= 3.1
+  EnforcedShorthandSyntax: never
+
+Style/RedundantStringEscape:
+  # This removes redundant string escapes but will break regex built from strings.
+  # Example:
+  #   The string s = "ciccio\.?pasticcio" will be corrected as q = "ciccio.?pasticcio"
+  #   becase a dot is not a special char for string. But
+  #   Regex.new(s) => /ciccio\.?pasticcio/
+  #   which correctly matches "ciccio.pasticcio" and not "ciccioApasticcio"
+  #   while
+  #   Regex.new(q) => /ciccio.?pasticcio/
+  #   which correctly matches "ciccio.pasticcio" but also anything like "ciccioApasticcio"
+  # Probably, building regexes from strings is not a good idea afterall.
+  # I disable it until I got rid of all Regexes built from strings
+  Enabled: false
+
+# Layout/IndentationStyle:
+#   EnforcedStyle: spaces
+#   Enabled: true
+# Layout/IndentationWidth:
+#   Enabled: true
+
+Style/StringLiterals:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/YodaCondition:
+  Enabled: true
+  EnforcedStyle: forbid_for_equality_operators_only
+
+Security/MarshalLoad:
+  Enabled: false
+
+Rails/RefuteMethods:
+  Enabled: false
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false

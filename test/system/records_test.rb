@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "application_system_test_case"
 
 class RecordsTest < ApplicationSystemTestCase
@@ -7,6 +9,7 @@ class RecordsTest < ApplicationSystemTestCase
 
   test "visiting the index" do
     visit records_url
+
     assert_selector "h1", text: "Records"
   end
 
