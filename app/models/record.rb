@@ -9,7 +9,7 @@ class Record < ApplicationRecord
   end
 
   def gandi_name
-    base = ENV.fetch('SUBDOMAIN')
+    base = Rails.configuration.subdomain
     if base
       "#{name}.#{base}"
     else
@@ -18,7 +18,7 @@ class Record < ApplicationRecord
   end
 
   def full_gandi_name
-    base = ENV.fetch('SUBDOMAIN')
+    base = Rails.configuration.subdomain
     if base
       "#{name}.#{base}.#{Rails.application.credentials.domain}"
     else
