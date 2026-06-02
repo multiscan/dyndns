@@ -8,7 +8,7 @@ class RecordsController < ApplicationController
 
   # GET /records or /records.json
   def index
-    @records = Record.all
+    @records = Record.order(:name)
   end
 
   # GET /records/1 or /records/1.json
