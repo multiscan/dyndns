@@ -54,7 +54,7 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 
-  gem 'brakeman'
+  gem 'brakeman', '>=8.0.5'
   gem 'bundler-audit'
 
   # Code Linter / checker
